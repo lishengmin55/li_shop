@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:li_shop/api/home.dart';
 import 'package:li_shop/viewmodels/home.dart';
 import '../../../components/Home/HomeSlider.dart';
 import '../../../components/Home/Category.dart';
@@ -15,15 +16,25 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   List<BannerItem> _banners = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _banners = [
-      BannerItem(id: '1', imgUrl: 'lib/assets/屏幕截图 2026-04-01 211528.png'),
-      BannerItem(id: '2', imgUrl: 'lib/assets/屏幕截图 2026-04-01 211540.png'),
-      BannerItem(id: '3', imgUrl: 'lib/assets/屏幕截图 2026-04-01 211550.png'),
-    ];
+    _loadBanners();
+  }
+
+  Future<void> _loadBanners() async {
+    try {
+      final banners = await getBannerList();
+      setState(() {
+        _banners = banners;
+        _isLoading = false;
+      });
+    } catch (error) {
+      print('获取轮播图失败: $error');
+      // 使用默认数据
+    }
   }
 
   @override
@@ -55,7 +66,15 @@ class _HomeViewState extends State<HomeView> {
       ),
       body: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(child: HomeSlider(banners: _banners)),
+          SliverToBoxAdapter(
+            child: _isLoading
+                ? Container(
+                    height: 300,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(),
+                  )
+                : HomeSlider(banners: _banners),
+          ),
           SliverToBoxAdapter(child: Category()),
           SliverToBoxAdapter(child: Suggestion()),
           SliverToBoxAdapter(

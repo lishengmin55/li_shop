@@ -1,57 +1,64 @@
 import 'package:flutter/material.dart';
 
 class Category extends StatefulWidget {
-  Category({Key? key}) : super(key: key);
+  const Category({Key? key}) : super(key: key);
 
   @override
   _CategoryState createState() => _CategoryState();
 }
 
 class _CategoryState extends State<Category> {
-  final List<Map<String, dynamic>> _categories = [
-    {'name': '手机', 'icon': Icons.phone_android},
-    {'name': '电脑', 'icon': Icons.laptop},
-    {'name': '服装', 'icon': Icons.checkroom},
-    {'name': '食品', 'icon': Icons.restaurant},
-    {'name': '家电', 'icon': Icons.tv},
-    {'name': '美妆', 'icon': Icons.face},
-    {'name': '图书', 'icon': Icons.book},
-    {'name': '更多', 'icon': Icons.more_horiz},
-  ];
+  final List<String> _categories = List.generate(
+    8,
+    (index) => '分类${index + 1}',
+  );
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(10),
-      child: GridView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          childAspectRatio: 0.8,
-        ),
+      height: 120,
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
         itemCount: _categories.length,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         itemBuilder: (context, index) {
-          return Column(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: Icon(
-                  _categories[index]['icon'],
-                  color: Colors.blue,
-                  size: 24,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(_categories[index]['name'], style: TextStyle(fontSize: 12)),
-            ],
-          );
+          return _buildCategoryItem(_categories[index]);
         },
+      ),
+    );
+  }
+
+  Widget _buildCategoryItem(String title) {
+    return Container(
+      width: 80,
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.green.shade100,
+              borderRadius: BorderRadius.circular(30),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              title.substring(2),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+        ],
       ),
     );
   }

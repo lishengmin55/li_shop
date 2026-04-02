@@ -12,26 +12,26 @@ class _SuggestionState extends State<Suggestion> {
     {
       'title': '智能手机',
       'price': '¥3999',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Smartphone%20product%20image&image_size=square',
+      'color': Colors.blue.shade100,
+      'icon': Icons.phone_android,
     },
     {
       'title': '笔记本电脑',
       'price': '¥5999',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Laptop%20computer%20product%20image&image_size=square',
+      'color': Colors.purple.shade100,
+      'icon': Icons.laptop,
     },
     {
       'title': '无线耳机',
       'price': '¥899',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Wireless%20earbuds%20product%20image&image_size=square',
+      'color': Colors.green.shade100,
+      'icon': Icons.headphones,
     },
     {
       'title': '智能手表',
       'price': '¥1299',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Smart%20watch%20product%20image&image_size=square',
+      'color': Colors.orange.shade100,
+      'icon': Icons.watch,
     },
   ];
 
@@ -65,9 +65,13 @@ class _SuggestionState extends State<Suggestion> {
                         height: 120,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: NetworkImage(_suggestions[index]['image']),
-                            fit: BoxFit.cover,
+                          color: _suggestions[index]['color'],
+                        ),
+                        child: Center(
+                          child: Icon(
+                            _suggestions[index]['icon'],
+                            size: 50,
+                            color: Colors.black54,
                           ),
                         ),
                       ),

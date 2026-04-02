@@ -13,36 +13,36 @@ class _HotState extends State<Hot> {
       'rank': 1,
       'title': '无线蓝牙耳机 降噪长续航',
       'price': '¥299',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Wireless%20bluetooth%20earphones%20product%20image&image_size=square',
+      'color': Colors.red.shade100,
+      'icon': Icons.headphones,
     },
     {
       'rank': 2,
       'title': '智能手环 心率监测',
       'price': '¥199',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Fitness%20tracker%20smart%20band%20product%20image&image_size=square',
+      'color': Colors.orange.shade100,
+      'icon': Icons.watch,
     },
     {
       'rank': 3,
       'title': '便携充电宝 20000mAh',
       'price': '¥129',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Power%20bank%20portable%20charger%20product%20image&image_size=square',
+      'color': Colors.yellow.shade100,
+      'icon': Icons.battery_charging_full,
     },
     {
       'rank': 4,
       'title': '运动水杯 保温保冷',
       'price': '¥89',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Sports%20water%20bottle%20product%20image&image_size=square',
+      'color': Colors.green.shade100,
+      'icon': Icons.local_drink,
     },
     {
       'rank': 5,
       'title': '蓝牙音箱 便携防水',
       'price': '¥199',
-      'image':
-          'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Bluetooth%20speaker%20portable%20product%20image&image_size=square',
+      'color': Colors.blue.shade100,
+      'icon': Icons.speaker,
     },
   ];
 
@@ -86,9 +86,13 @@ class _HotState extends State<Hot> {
                         height: 80,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: NetworkImage(_hotProducts[index]['image']),
-                            fit: BoxFit.cover,
+                          color: _hotProducts[index]['color'],
+                        ),
+                        child: Center(
+                          child: Icon(
+                            _hotProducts[index]['icon'],
+                            size: 36,
+                            color: Colors.black54,
                           ),
                         ),
                       ),

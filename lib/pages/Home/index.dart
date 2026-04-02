@@ -19,7 +19,9 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(title: Text('首页'), centerTitle: true),
       body: ListView(
         children: [
-          Slider(),
+          SliverToBoxAdapter(
+            child: HomeSlider(),
+          ),
           Category(),
           Suggestion(),
           Hot(),

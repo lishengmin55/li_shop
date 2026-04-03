@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:li_shop/api/home.dart';
 import 'package:li_shop/viewmodels/home.dart';
-import '../../../components/Home/HomeSlider.dart';
+import '../../../components/Home/HomeSlider.dart'
+    show HomeSlider, getDefaultBanners;
 import '../../../components/Home/Category.dart';
 import '../../../components/Home/Suggestion.dart';
 import '../../../components/Home/Hot.dart';
@@ -34,6 +35,10 @@ class _HomeViewState extends State<HomeView> {
     } catch (error) {
       print('获取轮播图失败: $error');
       // 使用默认数据
+      setState(() {
+        _banners = getDefaultBanners();
+        _isLoading = false;
+      });
     }
   }
 

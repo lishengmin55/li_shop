@@ -1,0 +1,4 @@
+1.网络请求封装 （DioRequest）
+2.API 常量定义 （HttpConstants）
+3.API 服务层 （api 目录下的文件）
+4.数据模型 （viewmodels 目录下的文件）

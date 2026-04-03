@@ -31,36 +31,21 @@ class _HomeSliderState extends State<HomeSlider> {
 
   void _startAutoPlay() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (widget.banners.isNotEmpty) {
-        if (_currentIndex < widget.banners.length - 1) {
-          _currentIndex++;
-        } else {
-          _currentIndex = 0;
-        }
-        _controller.animateToPage(
-          _currentIndex,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
+      if (_currentIndex < widget.banners.length - 1) {
+        _currentIndex++;
+      } else {
+        _currentIndex = 0;
       }
+      _controller.animateToPage(
+        _currentIndex,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.banners.isEmpty) {
-      return Container(
-        height: 300,
-        margin: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(10),
-        ),
-        alignment: Alignment.center,
-        child: const Text('暂无轮播图'),
-      );
-    }
-
     return SizedBox(
       height: 300,
       child: Stack(
@@ -79,34 +64,10 @@ class _HomeSliderState extends State<HomeSlider> {
                 margin: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image(
-                    image: _getImageProvider(banner.imgUrl),
+                  image: DecorationImage(
+                    image: AssetImage(banner.imgUrl),
                     fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[200],
-                        alignment: Alignment.center,
-                        child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
-                      );
-                    },
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
-                      return Container(
-                        color: Colors.grey[200],
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
                   ),
                 ),
               );
@@ -148,13 +109,5 @@ class _HomeSliderState extends State<HomeSlider> {
         ],
       ),
     );
-  }
-
-  ImageProvider _getImageProvider(String imgUrl) {
-    if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) {
-      return NetworkImage(imgUrl);
-    } else {
-      return AssetImage(imgUrl);
-    }
   }
 }

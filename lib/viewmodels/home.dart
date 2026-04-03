@@ -2,9 +2,9 @@ class BannerItem {
   String id;
   String imgUrl;
 
-  BannerItem(this.id, this.imgUrl);
+  BannerItem({required this.id, required this.imgUrl});
 
   factory BannerItem.fromJson(Map<String, dynamic> json) {
-    return BannerItem(json["id"], json["imgUrl"]);
+    return BannerItem(id: json["id"], imgUrl: json["imgUrl"] ?? "");
   }
 }

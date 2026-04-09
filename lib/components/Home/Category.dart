@@ -1,36 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:li_shop/viewmodels/home.dart';
 
 class Category extends StatefulWidget {
-  const Category({Key? key}) : super(key: key);
+
+  final List<CategoryItem> categories;
+  const Category({Key? key, required this.categories}) : super(key: key);
 
   @override
   _CategoryState createState() => _CategoryState();
 }
 
 class _CategoryState extends State<Category> {
-  final List<String> _categories = List.generate(
-    8,
-    (index) => '分类${index + 1}',
-  );
-
   @override
   Widget build(BuildContext context) {
+    if (widget.categories.isEmpty) {
+      return Container(
+        height: 120,
+        color: Colors.white,
+        alignment: Alignment.center,
+        child: const Text('暂无分类数据'),
+      );
+    }
+
     return Container(
-      height: 120,
+      height: 140,
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 25),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: _categories.length,
+        itemCount: widget.categories.length,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         itemBuilder: (context, index) {
-          return _buildCategoryItem(_categories[index]);
+          return _buildCategoryItem(widget.categories[index]);
         },
       ),
     );
   }
 
-  Widget _buildCategoryItem(String title) {
+  Widget _buildCategoryItem(CategoryItem category) {
     return Container(
       width: 80,
       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -40,23 +47,50 @@ class _CategoryState extends State<Category> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: Colors.green.shade100,
               borderRadius: BorderRadius.circular(30),
+              color: Colors.grey[200],
             ),
-            alignment: Alignment.center,
-            child: Text(
-              title.substring(2),
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
+            clipBehavior: Clip.antiAlias,
+            child: Image.network(
+              category.picture,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[200],
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.image_not_supported,
+                    size: 30,
+                    color: Colors.grey,
+                  ),
+                );
+              },
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  color: Colors.grey[200],
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            title,
+            category.name,
             style: const TextStyle(fontSize: 14, color: Colors.black87),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

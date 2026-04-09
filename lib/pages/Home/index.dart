@@ -5,8 +5,7 @@ import '../../../components/Home/HomeSlider.dart'
     show HomeSlider, getDefaultBanners;
 import '../../../components/Home/Category.dart';
 import '../../../components/Home/Suggestion.dart';
-import '../../../components/Home/Hot.dart';
-import '../../../components/Home/MoreList.dart';
+import '../../../components/Home/Hot.dart' ;
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -17,12 +16,32 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   List<BannerItem> _banners = [];
+  List<CategoryItem> _categories = [];
+  HomeRecommendResult _suggestion = HomeRecommendResult(
+    id: "",
+    title: "",
+    subTypes: [],
+  );
+  HomeRecommendResult _inVogue = HomeRecommendResult(
+    id: "",
+    title: "",
+    subTypes: [],
+  );
+  HomeRecommendResult _oneStop = HomeRecommendResult(
+    id: "",
+    title: "",
+    subTypes: [],
+  );
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _loadBanners();
+    _loadCategories();
+    _loadSuggestion();
+    _loadInVogue();
+    _loadOneStop();
   }
 
   Future<void> _loadBanners() async {
@@ -39,6 +58,58 @@ class _HomeViewState extends State<HomeView> {
         _banners = getDefaultBanners();
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final categories = await getCategoryList();
+      setState(() {
+        _categories = categories;
+        _isLoading = false;
+      });
+    } catch (error) {
+      print('获取分类失败: $error');
+      // 使用默认数据
+      setState(() {
+        _categories = [];
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadSuggestion() async {
+    try {
+      final suggestion = await getHomeRecommend();
+      setState(() {
+        _suggestion = suggestion;
+        _isLoading = false;
+      });
+    } catch (error) {
+      print('获取热门商品失败: $error');
+      setState(() {});
+    }
+  }
+
+  Future<void> _loadInVogue() async {
+    try {
+      final inVogue = await getInVogueList();
+      setState(() {
+        _inVogue = inVogue;
+      });
+    } catch (error) {
+      print('获取爆款推荐失败: $error');
+    }
+  }
+
+  Future<void> _loadOneStop() async {
+    try {
+      final oneStop = await getOneStopList();
+      setState(() {
+        _oneStop = oneStop;
+      });
+    } catch (error) {
+      print('获取一站买全失败: $error');
     }
   }
 
@@ -80,76 +151,10 @@ class _HomeViewState extends State<HomeView> {
                   )
                 : HomeSlider(banners: _banners),
           ),
-          SliverToBoxAdapter(child: Category()),
-          SliverToBoxAdapter(child: Suggestion()),
+          SliverToBoxAdapter(child: Category(categories: _categories)),
+          SliverToBoxAdapter(child: Suggestion(suggestion: _suggestion)),
           SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '热门商品',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      Hot(title: '热门1'),
-                      const SizedBox(width: 10),
-                      Hot(title: '热门2'),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      Hot(title: '热门3'),
-                      const SizedBox(width: 10),
-                      Hot(title: '热门4'),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    '更多商品',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Column(
-                    children: [
-                      Flex(
-                        direction: Axis.horizontal,
-                        children: [MoreList(title: '更多1')],
-                      ),
-                      const SizedBox(height: 20),
-                      Flex(
-                        direction: Axis.horizontal,
-                        children: [MoreList(title: '更多3')],
-                      ),
-                      const SizedBox(height: 20),
-                      Flex(
-                        direction: Axis.horizontal,
-                        children: [MoreList(title: '更多4')],
-                      ),
-                      const SizedBox(height: 20),
-                      Flex(
-                        direction: Axis.horizontal,
-                        children: [MoreList(title: '更多5')],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            child: Hot(inVogue: _inVogue, oneStop: _oneStop),
           ),
         ],
       ),

@@ -5,7 +5,8 @@ import '../../../components/Home/HomeSlider.dart'
     show HomeSlider, getDefaultBanners;
 import '../../../components/Home/Category.dart';
 import '../../../components/Home/Suggestion.dart';
-import '../../../components/Home/Hot.dart' ;
+import '../../../components/Home/Hot.dart';
+import '../../../components/Home/MoreList.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -34,6 +35,16 @@ class _HomeViewState extends State<HomeView> {
   );
   bool _isLoading = true;
 
+  List<GoodDetailItem> _recommend = [];
+
+  final ScrollController _scrollController = ScrollController();
+
+  int _limit = 20;
+
+  bool _isLoadingMore = false;
+
+  bool _hasMore = true;
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +53,26 @@ class _HomeViewState extends State<HomeView> {
     _loadSuggestion();
     _loadInVogue();
     _loadOneStop();
+    _loadRecommend();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// 滚动监听器：检测是否滚动到页面底部
+  /// 当滚动位置距离底部100像素以内时，触发加载更多
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
+      if (!_isLoadingMore && _hasMore) {
+        _loadMoreRecommend();
+      }
+    }
   }
 
   Future<void> _loadBanners() async {
@@ -53,7 +84,6 @@ class _HomeViewState extends State<HomeView> {
       });
     } catch (error) {
       print('获取轮播图失败: $error');
-      // 使用默认数据
       setState(() {
         _banners = getDefaultBanners();
         _isLoading = false;
@@ -70,7 +100,6 @@ class _HomeViewState extends State<HomeView> {
       });
     } catch (error) {
       print('获取分类失败: $error');
-      // 使用默认数据
       setState(() {
         _categories = [];
         _isLoading = false;
@@ -113,13 +142,66 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  /// 初始加载推荐列表
+  /// 使用当前的 _limit 值作为请求参数
+  Future<void> _loadRecommend() async {
+    try {
+      final recommend = await getRecommend(param: {'limit': _limit});
+      setState(() {
+        _recommend = recommend;
+      });
+    } catch (error) {
+      print('获取推荐列表失败: $error');
+    }
+  }
+
+  /// 加载更多推荐列表
+  /// 每次调用时 limit 增加 10，实现分页加载效果
+  ///
+  /// 流程说明：
+  /// 1. 检查是否正在加载或没有更多数据，如果是则直接返回
+  /// 2. 设置 _isLoadingMore 为 true，显示加载指示器
+  /// 3. 将 _limit 增加 10
+  /// 4. 发起网络请求获取新的数据
+  /// 5. 如果返回数据为空，设置 _hasMore 为 false
+  /// 6. 如果请求失败，回滚 _limit 值
+  Future<void> _loadMoreRecommend() async {
+    if (_isLoadingMore || !_hasMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    try {
+      _limit += 10;
+      final newRecommend = await getRecommend(param: {'limit': _limit});
+
+      setState(() {
+        if (newRecommend.isEmpty) {
+          _hasMore = false;
+        } else {
+          _recommend = newRecommend;
+        }
+        _isLoadingMore = false;
+      });
+    } catch (error) {
+      print('加载更多推荐列表失败: $error');
+      setState(() {
+        _isLoadingMore = false;
+        _limit -= 10;
+      });
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50.0),
         child: AppBar(
-          automaticallyImplyLeading: false, // 隐藏默认返回按钮
+          automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           elevation: 0,
           title: Container(
@@ -141,6 +223,7 @@ class _HomeViewState extends State<HomeView> {
         ),
       ),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           SliverToBoxAdapter(
             child: _isLoading
@@ -156,6 +239,23 @@ class _HomeViewState extends State<HomeView> {
           SliverToBoxAdapter(
             child: Hot(inVogue: _inVogue, oneStop: _oneStop),
           ),
+          SliverToBoxAdapter(child: MoreList(recommendList: _recommend)),
+          if (_isLoadingMore)
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.all(16),
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          if (!_hasMore)
+            SliverToBoxAdapter(
+              child: Container(
+                padding: EdgeInsets.all(16),
+                alignment: Alignment.center,
+                child: Text('没有更多数据了', style: TextStyle(color: Colors.grey)),
+              ),
+            ),
         ],
       ),
     );

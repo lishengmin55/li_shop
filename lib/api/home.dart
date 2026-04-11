@@ -29,3 +29,13 @@ Future<HomeRecommendResult> getOneStopList() async {
   final result = await dioRequest.get(HttpConstants.ONE_STOP_LIST);
   return HomeRecommendResult.fromJson(result);
 }
+
+Future<List<GoodDetailItem>> getRecommend({
+  Map<String, dynamic> param = const {'limit': 20},
+}) async {
+  final result = await dioRequest.get(
+    HttpConstants.RECOMMEND_LIST,
+    params: param,
+  );
+  return (result as List).map((e) => GoodDetailItem.formJSON(e)).toList();
+}

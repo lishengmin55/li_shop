@@ -90,7 +90,7 @@ class _HotState extends State<Hot> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        height: isExpanded ? 100 : 120,
+        height: isExpanded ? 150 : 120,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -211,7 +211,7 @@ class _HotState extends State<Hot> {
           const Divider(height: 1),
           const SizedBox(height: 15),
           SizedBox(
-            height: 200,
+            height: 190,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: items.length,
@@ -271,30 +271,6 @@ class _HotState extends State<Hot> {
                   },
                 ),
               ),
-              if (index < 3)
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: index == 0
-                          ? Colors.red[500]
-                          : index == 1
-                              ? Colors.orange[400]
-                              : Colors.yellow[600],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '${index + 1}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
           Expanded(

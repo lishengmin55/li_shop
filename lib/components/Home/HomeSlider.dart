@@ -14,9 +14,9 @@ class HomeSlider extends StatefulWidget {
 // 默认静态图片轮播数据
 List<BannerItem> getDefaultBanners() {
   return [
-    BannerItem(id: '1', imgUrl: 'lib/assets/屏幕截图 2026-04-01 211528.png'),
-    BannerItem(id: '2', imgUrl: 'lib/assets/屏幕截图 2026-04-01 211540.png'),
-    BannerItem(id: '3', imgUrl: 'lib/assets/屏幕截图 2026-04-01 211550.png'),
+    BannerItem(id: '1', imgUrl: 'assets/image.png'),
+    BannerItem(id: '2', imgUrl: 'assets/image copy.png'),
+    BannerItem(id: '3', imgUrl: 'assets/image copy2.png'),
   ];
 }
 

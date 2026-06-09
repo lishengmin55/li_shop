@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:li_shop/api/home.dart';
 import 'package:li_shop/viewmodels/home.dart';
+import 'package:li_shop/utils/Toastutils.dart';
 import '../../../components/Home/HomeSlider.dart'
     show HomeSlider, getDefaultBanners;
 import '../../../components/Home/Category.dart';
@@ -48,12 +49,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _loadBanners();
-    _loadCategories();
-    _loadSuggestion();
-    _loadInVogue();
-    _loadOneStop();
-    _loadRecommend();
+    _onRefresh();
     _scrollController.addListener(_onScroll);
   }
 
@@ -179,13 +175,16 @@ class _HomeViewState extends State<HomeView> {
       setState(() {
         if (newRecommend.isEmpty) {
           _hasMore = false;
+          ToastUtils.showNoMoreData();
         } else {
           _recommend = newRecommend;
+          ToastUtils.showLoadMoreSuccess();
         }
         _isLoadingMore = false;
       });
     } catch (error) {
       print('加载更多推荐列表失败: $error');
+      ToastUtils.showLoadMoreError(error.toString());
       setState(() {
         _isLoadingMore = false;
         _limit -= 10;
@@ -193,7 +192,47 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  /// 下拉刷新
+  /// 重新加载所有数据，并重置分页状态
+  ///
+  /// 流程说明：
+  /// 1. 重置 _limit 为初始值 20
+  /// 2. 重置 _hasMore 为 true
+  /// 3. 并行请求所有数据接口
+  /// 4. 更新 UI 状态并显示刷新结果提示
+  Future<void> _onRefresh() async {
+    _limit = 20;
+    _hasMore = true;
 
+    try {
+      final results = await Future.wait([
+        getBannerList(),
+        getCategoryList(),
+        getHomeRecommend(),
+        getInVogueList(),
+        getOneStopList(),
+        getRecommend(param: {'limit': _limit}),
+      ]);
+
+      setState(() {
+        _banners = results[0] as List<BannerItem>;
+        _categories = results[1] as List<CategoryItem>;
+        _suggestion = results[2] as HomeRecommendResult;
+        _inVogue = results[3] as HomeRecommendResult;
+        _oneStop = results[4] as HomeRecommendResult;
+        _recommend = results[5] as List<GoodDetailItem>;
+        _isLoading = false;
+      });
+
+      ToastUtils.showRefreshSuccess();
+    } catch (error) {
+      print('刷新数据失败: $error');
+      ToastUtils.showRefreshError(error.toString());
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -222,41 +261,44 @@ class _HomeViewState extends State<HomeView> {
           toolbarHeight: 50,
         ),
       ),
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverToBoxAdapter(
-            child: _isLoading
-                ? Container(
-                    height: 300,
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator(),
-                  )
-                : HomeSlider(banners: _banners),
-          ),
-          SliverToBoxAdapter(child: Category(categories: _categories)),
-          SliverToBoxAdapter(child: Suggestion(suggestion: _suggestion)),
-          SliverToBoxAdapter(
-            child: Hot(inVogue: _inVogue, oneStop: _oneStop),
-          ),
-          SliverToBoxAdapter(child: MoreList(recommendList: _recommend)),
-          if (_isLoadingMore)
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
             SliverToBoxAdapter(
-              child: Container(
-                padding: EdgeInsets.all(16),
-                alignment: Alignment.center,
-                child: CircularProgressIndicator(),
-              ),
+              child: _isLoading
+                  ? Container(
+                      height: 300,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(),
+                    )
+                  : HomeSlider(banners: _banners),
             ),
-          if (!_hasMore)
+            SliverToBoxAdapter(child: Category(categories: _categories)),
+            SliverToBoxAdapter(child: Suggestion(suggestion: _suggestion)),
             SliverToBoxAdapter(
-              child: Container(
-                padding: EdgeInsets.all(16),
-                alignment: Alignment.center,
-                child: Text('没有更多数据了', style: TextStyle(color: Colors.grey)),
-              ),
+              child: Hot(inVogue: _inVogue, oneStop: _oneStop),
             ),
-        ],
+            SliverToBoxAdapter(child: MoreList(recommendList: _recommend)),
+            if (_isLoadingMore)
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  alignment: Alignment.center,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            if (!_hasMore)
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  alignment: Alignment.center,
+                  child: Text('没有更多数据了', style: TextStyle(color: Colors.grey)),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

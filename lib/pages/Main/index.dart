@@ -17,19 +17,19 @@ class _MainPageState extends State<MainPage> {
   // 渲染四个导航
   final List<Map<String, String>> _tabList = [
     {
-      'icon': 'lib/assets/home-outline.png',
+      'icon': 'assets/home-outline.png',
       'title': '首页',
     },
     {
-      'icon': 'lib/assets/shape-outline.png',
+      'icon': 'assets/shape-outline.png',
       'title': '分类'
     },
     {
-      'icon': 'lib/assets/cart-outline.png',
+      'icon': 'assets/cart-outline.png',
       'title': '购物车'
     },
     {
-      'icon': 'lib/assets/account-outline.png',
+      'icon': 'assets/account-outline.png',
       'title': '我的'
     },
   ];

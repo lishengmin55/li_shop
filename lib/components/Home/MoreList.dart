@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:li_shop/viewmodels/home.dart';
+import 'package:li_shop/stores/CartStore.dart';
 
 class MoreList extends StatefulWidget {
   final List<GoodDetailItem> recommendList;
@@ -200,21 +201,38 @@ class _MoreListState extends State<MoreList> {
                               ),
                             ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.red[600],
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: const Text(
-                              '购买',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                          GestureDetector(
+                            onTap: () {
+                              cartStore.addItem(CartItem(
+                                id: goods.id,
+                                name: goods.name,
+                                price: goods.price,
+                                picture: goods.picture,
+                              ));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('已加入购物车'),
+                                  duration: Duration(seconds: 1),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.red[600],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Text(
+                                '加入购物车',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
